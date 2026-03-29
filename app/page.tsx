@@ -86,14 +86,14 @@ export default function Home() {
       </div>
 
       {/* ─── HERO BANNER SENIOR (ESTILO APPLE) ─── */}
-      <section className="bg-slate-50 py-20 md:py-32 border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-6 text-center">
+      <section className="bg-slate-50 py-20 md:py-32 border-b border-slate-100 relative overflow-hidden group">
+        <div className="max-w-7xl mx-auto px-6 text-center z-10 relative">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-cyan-50 border border-cyan-100 mb-10 rounded-full shadow-inner">
              <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></div>
              <span className="text-[11px] font-black text-cyan-600 tracking-widest uppercase">LA DORADA | CALDAS</span>
           </div>
-          <h2 className="text-5xl md:text-7xl font-black text-slate-950 leading-[1.05] mb-8 uppercase tracking-tighter">
-            Eleva tu <span className="text-cyan-500">tecnología</span> <br /> para tu estilo
+          <h2 className="text-5xl md:text-7xl font-black text-slate-950 leading-[1.05] mb-8 uppercase tracking-tighter transition-transform duration-500 group-hover:scale-105">
+            Eleva tu <span className="text-cyan-500 transition-colors group-hover:text-blue-600">tecnología</span> <br /> para tu estilo
           </h2>
           <p className="text-slate-600 text-xl md:text-2xl mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
             Hardware verificado y accesorios premium. Tu contenido merece brillar con lo mejor de La Dorada.
@@ -106,6 +106,12 @@ export default function Home() {
                Ver Relojes
             </button>
           </div>
+        </div>
+        <div className="absolute top-0 right-0 h-full w-1/3 opacity-5 group-hover:opacity-10 transition-opacity duration-1000">
+           <img src={inventarioKardex[6].image} alt="" className="object-contain h-full w-full rotate-12 transition-transform duration-1000 group-hover:rotate-0 group-hover:scale-110" />
+        </div>
+        <div className="absolute top-0 left-0 h-full w-1/3 opacity-5 group-hover:opacity-10 transition-opacity duration-1000">
+           <img src={inventarioKardex[3].image} alt="" className="object-contain h-full w-full -rotate-12 transition-transform duration-1000 group-hover:rotate-0 group-hover:scale-110" />
         </div>
       </section>
 
@@ -138,8 +144,14 @@ export default function Home() {
       </main>
 
       {/* ─── FOOTER SENIOR (EL QUE FALTABA) ─── */}
-      <footer className="bg-slate-50 border-t border-slate-100 py-20 text-slate-700">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-16">
+      <footer className="bg-slate-50 border-t border-slate-100 py-20 text-slate-700 relative overflow-hidden group">
+        <div className="absolute top-0 right-0 h-full w-1/3 opacity-5 group-hover:opacity-10 transition-opacity duration-1000">
+           <img src={inventarioKardex[0].image} alt="" className="object-contain h-full w-full rotate-12 transition-transform duration-1000 group-hover:rotate-0 group-hover:scale-110" />
+        </div>
+        <div className="absolute top-0 left-0 h-full w-1/3 opacity-5 group-hover:opacity-10 transition-opacity duration-1000">
+           <img src={inventarioKardex[8].image} alt="" className="object-contain h-full w-full -rotate-12 transition-transform duration-1000 group-hover:rotate-0 group-hover:scale-110" />
+        </div>
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-16 relative z-10">
           <div>
             <div className="flex items-center gap-4 mb-8">
               <div className="h-12 w-12 flex items-center justify-center p-1 rounded-full bg-white border border-slate-200 shadow-sm opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300">
@@ -150,49 +162,49 @@ export default function Home() {
             <p className="text-xs text-slate-500 uppercase font-black tracking-widest leading-loose">Tu tecnología, verificado y premium. Innovación en el corazón de Colombia.</p>
           </div>
           <div className="flex flex-col gap-5">
-            <h6 className="text-[11px] font-black uppercase tracking-[0.3em] text-cyan-600 mb-3">Ubicación</h6>
-            <p className="text-sm font-bold text-slate-800">Calle Real - Centro de La Dorada</p>
-            <p className="text-sm font-medium">Departamento de Caldas - Colombia</p>
+            <h6 className="text-[11px] font-black uppercase tracking-[0.3em] text-cyan-600 mb-3 hover:text-cyan-500 transition-colors">Ubicación</h6>
+            <p className="text-sm font-bold text-slate-800 uppercase tracking-tighter">Calle Real - Centro de La Dorada</p>
+            <p className="text-sm font-medium transition-colors hover:text-slate-950">Departamento de Caldas - Colombia</p>
           </div>
-          <div className="flex flex-col gap-5 bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-slate-900/5">
+          <div className="flex flex-col gap-5 bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-slate-900/5 group-hover:border-cyan-100 transition-colors">
              <h6 className="text-[11px] font-black uppercase tracking-[0.3em] text-cyan-600 mb-3">Horario Comercial</h6>
              <p className="text-sm font-bold text-slate-800">Lunes a Sábado: 8:00 AM - 7:00 PM</p>
-             <p className="text-[10px] text-slate-500 font-mono tracking-widest uppercase">CATÁLOGO VERIFICADO 2026</p>
+             <p className="text-[10px] text-slate-500 font-mono tracking-widest uppercase group-hover:text-slate-700">CATÁLOGO VERIFICADO 2026</p>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto px-6 pt-10 mt-16 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="max-w-7xl mx-auto px-6 pt-10 mt-16 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 relative z-10">
           <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">© 2026 MUNDO ACCESORIOS DORADA | LA DORADA, CALDAS</p>
-          <a href={whatsappUrlBase} target="_blank" className="text-cyan-600 font-black uppercase text-[10px] hover:underline">Soporte por WhatsApp</a>
+          <a href={whatsappUrlBase} target="_blank" className="text-cyan-600 font-black uppercase text-[10px] hover:underline hover:text-cyan-500 transition-colors">Soporte por WhatsApp</a>
         </div>
       </footer>
 
       {/* ─── CARRITO (DRAWER SENIOR) ─── */}
       {cartOpen && (
         <div className="fixed inset-0 z-[100] flex justify-end">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setCartOpen(false)} />
-          <div className="relative w-full max-w-sm bg-white flex flex-col h-full shadow-3xl animate-slideIn">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fadeIn" onClick={() => setCartOpen(false)} />
+          <div className="relative w-full max-w-sm bg-white flex flex-col h-full shadow-3xl animate-slideInRight">
             <div className="p-7 border-b border-slate-100 flex justify-between items-center bg-white sticky top-0 z-10">
               <h2 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3">
-                <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                <svg className="w-6 h-6 text-slate-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                 Pedido ({cart.length})
               </h2>
               <button onClick={() => setCartOpen(false)} className="text-slate-400 hover:text-slate-900 text-3xl font-black transition-transform hover:rotate-90">×</button>
             </div>
             <div className="flex-1 overflow-y-auto p-7 space-y-5 bg-slate-50/50">
               {cart.length === 0 ? (
-                <div className="text-center py-16 opacity-30 text-slate-500">
-                    <svg className="w-20 h-20 mx-auto mb-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                    <p className="font-black uppercase text-xs">Añade productos</p>
+                <div className="text-center py-16 opacity-30 text-slate-500 flex flex-col items-center justify-center h-full">
+                    <svg className="w-20 h-20 mb-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                    <p className="font-black uppercase text-xs tracking-widest">Tu carrito está vacío, fafacho</p>
                 </div>
               ) : (
                 cart.map((item, i) => (
-                  <div key={i} className="flex gap-4 bg-white p-3 rounded-2xl items-center border border-slate-100">
+                  <div key={i} className="flex gap-4 bg-white p-3 rounded-2xl items-center border border-slate-100 group transition-all duration-300 hover:border-cyan-100 hover:shadow-lg">
                     <div className="w-14 h-14 bg-white rounded-xl overflow-hidden p-1.5 flex-shrink-0 relative">
-                      <img src={item.image} alt="Cart item" className="w-full h-full object-contain" />
+                      <img src={item.image} alt="Cart item" className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-slate-900 uppercase truncate leading-tight mb-1">{item.name}</p>
-                      <p className="text-cyan-500 font-black text-sm">${item.price.toLocaleString('es-CO')}</p>
+                      <p className="text-xs font-bold text-slate-900 uppercase truncate leading-tight mb-1 group-hover:text-cyan-600 transition-colors">{item.name}</p>
+                      <p className="text-cyan-500 font-black text-sm group-hover:text-cyan-600 transition-colors">${item.price.toLocaleString('es-CO')}</p>
                     </div>
                   </div>
                 ))
