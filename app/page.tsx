@@ -1,722 +1,540 @@
 'use client';
+import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 
-import React, { useState, useEffect, useCallback } from 'react';
-
-const URL_LOGO =
-  'https://i.postimg.cc/9Rf9xYMW/Whats-App-Image-2026-03-28-at-4-42-36-PM-(1).jpg';
-
+// ─── PRODUCT DATA ──────────────────────────────────────────────────────────────
 const inventarioKardex = [
-  {
-    id: '263',
-    name: 'CARGADOR XO-30W GAN',
-    price: 30000,
-    stock: 372,
-    maxStock: 500,
-    category: 'Carga',
-    badge: 'FULL STOCK',
-    image: '/cargador-xo.jpg',
-  },
-  {
-    id: '264',
-    name: 'POWER BANK XO MAGSAFE',
-    price: 80000,
-    stock: 10,
-    maxStock: 50,
-    category: 'Carga',
-    badge: 'ÚLTIMAS 2',
-    image: '/powerbank-magsafe.jpg',
-  },
-  {
-    id: '25',
-    name: 'CABLE JOYROOM S-A29',
-    price: 15000,
-    stock: 100,
-    maxStock: 200,
-    category: 'Carga',
-    badge: 'OFERTA',
-    image: '/cable-joyroom.jpg',
-  },
-  {
-    id: '40',
-    name: 'AUDÍFONOS MONSTER DIADEMA',
-    price: 120000,
-    stock: 5,
-    maxStock: 20,
-    category: 'Audio',
-    badge: 'PREMIUM',
-    image: '/audifonos-monster.jpg',
-  },
-  {
-    id: '262',
-    name: 'AUDÍFONOS XO-Q7 TWS',
-    price: 45000,
-    stock: 30,
-    maxStock: 100,
-    category: 'Audio',
-    badge: 'MÁS VENDIDO',
-    image: '/audifonos-monster.jpg',
-  },
-  {
-    id: '56',
-    name: 'GIMBAL ESTABILIZADOR Q08',
-    price: 150000,
-    stock: 8,
-    maxStock: 20,
-    category: 'Creadores',
-    badge: 'PREMIUM',
-    image: '/gimbal.jpg',
-  },
-  {
-    id: '280',
-    name: 'ARO DE LUZ RGB U80',
-    price: 100000,
-    stock: 3,
-    maxStock: 10,
-    category: 'Creadores',
-    badge: 'OFERTA',
-    image: '/aro-luz.jpg',
-  },
-  {
-    id: '33',
-    name: 'RELOJ K9 ULTRA 2 MAX NEGRO',
-    price: 150000,
-    stock: 9,
-    maxStock: 20,
-    category: 'Relojes',
-    badge: 'PREMIUM',
-    image: '/reloj-negro.jpg',
-  },
-  {
-    id: '1179',
-    name: 'SMARTWATCH GS ULTRA 8',
-    price: 120000,
-    stock: 5,
-    maxStock: 20,
-    category: 'Relojes',
-    badge: 'NUEVO',
-    image: '/reloj-naranja.jpg',
-  },
-  {
-    id: '340',
-    name: 'TERMO STANLEY MARMO',
-    price: 85000,
-    stock: 15,
-    maxStock: 30,
-    category: 'Lifestyle',
-    badge: 'TENDENCIA',
-    image: '/termo-stanley.jpg',
-  },
+  { id:1,   name:'Audífonos JBL Tune 510BT', price:89900,  image:'/audifonos-jbl.jpg',        category:'Audífonos',     brand:'JBL',        stock:12 },
+  { id:2,   name:'Cargador Anker 65W USB-C',  price:79900,  image:'/cargador-anker.jpg',        category:'Cargadores',    brand:'Anker',      stock:20 },
+  { id:3,   name:'Audífonos Sony WH-1000XM5', price:899900, image:'/audifonos-sony.jpg',        category:'Audífonos',     brand:'Sony',       stock:5  },
+  { id:4,   name:'Cable USB-C Joyroom 1m',    price:19900,  image:'/cable-joyroom.jpg',         category:'Cables',        brand:'Joyroom',    stock:50 },
+  { id:5,   name:'Soporte para celular Baseus',price:34900,  image:'/soporte-baseus.jpg',        category:'Soportes',      brand:'Baseus',     stock:30 },
+  { id:6,   name:'Power Bank Xiaomi 10000mAh', price:119900, image:'/powerbank-xiaomi.jpg',      category:'Cargadores',    brand:'Xiaomi',     stock:15 },
+  { id:7,   name:'Audífonos Monster DNA Pro',  price:299900, image:'/audifonos-monster.jpg',     category:'Audífonos',     brand:'Monster',    stock:8  },
+  { id:8,   name:'Parlante JBL Flip 6',        price:399900, image:'/parlante-jbl.jpg',          category:'Parlantes',     brand:'JBL',        stock:7  },
+  { id:9,   name:'Aro de luz LED 26cm',        price:69900,  image:'/aro-luz.jpg',               category:'Creadores',     brand:'Genérico',   stock:22 },
+  { id:10,  name:'Trípode flexible Joby',      price:89900,  image:'/tripode-joby.jpg',          category:'Creadores',     brand:'Joby',       stock:18 },
+  { id:11,  name:'Micrófono de solapa Boya',   price:59900,  image:'/microfono-boya.jpg',        category:'Creadores',     brand:'Boya',       stock:25 },
+  { id:12,  name:'Gimbal DJI Osmo Mobile 6',   price:499900, image:'/gimbal.jpg',                category:'Creadores',     brand:'DJI',        stock:4  },
+  { id:40,  name:'Audífonos Xiaomi Redmi',      price:49900,  image:'/audifonos-xiaomi.jpg',      category:'Audífonos',     brand:'Xiaomi',     stock:30 },
+  { id:262, name:'Cable Lightning Joyroom',    price:24900,  image:'/cable-joyroom.jpg',         category:'Cables',        brand:'Joyroom',    stock:40 },
 ];
 
-const categorias = [
-  'Todos',
-  'Audio',
-  'Carga',
-  'Relojes',
-  'Creadores',
-  'Lifestyle',
-];
+const categories = ['Todos','Audífonos','Cargadores','Cables','Soportes','Parlantes','Creadores'];
 
+// ─── HERO SLIDES ──────────────────────────────────────────────────────────────
 const heroSlides = [
   {
-    image: '/audifonos-monster.jpg',
-    tag: 'AUDIO DE ALTO NIVEL',
-    title: 'Sonido que',
-    highlight: 'te pone en otro nivel',
-    sub: 'Audífonos premium con calidad profesional',
-    cta: 'Ver Audio',
-    color: 'from-cyan-500/30 to-transparent',
-    accent: 'cyan',
-  },
-  {
-    image: '/reloj-negro.jpg',
-    tag: 'RELOJES INTELIGENTES',
-    title: 'Lo último',
-    highlight: 'en tecnología wearable',
-    sub: 'Smartwatches que combinan estilo y función',
-    cta: 'Ver Relojes',
-    color: 'from-purple-500/30 to-transparent',
+    id: 1,
+    tag: 'NUEVA COLECCIÓN',
+    title: 'Sonido que te pone en otro nivel',
+    subtitle: 'Audífonos premium con cancelación de ruido. El mundo sigue, tú decides cuándo escucharlo.',
+    cta: 'Ver audífonos',
+    ctaLink: '#',
+    bg: 'from-slate-900 via-purple-950 to-slate-900',
     accent: 'purple',
+    image: '/audifonos-sony.jpg',
+    category: 'Audífonos',
   },
   {
-    image: '/gimbal.jpg',
+    id: 2,
+    tag: 'SIEMPRE CONECTADO',
+    title: 'Carga rápida. Sin excusas.',
+    subtitle: 'Tecnología GaN de última generación. De 0 a 100% antes de que termines el café.',
+    cta: 'Ver cargadores',
+    ctaLink: '#',
+    bg: 'from-slate-900 via-cyan-950 to-slate-900',
+    accent: 'cyan',
+    image: '/cargador-anker.jpg',
+    category: 'Cargadores',
+  },
+  {
+    id: 3,
     tag: 'PARA CREADORES',
-    title: 'Crea contenido',
-    highlight: 'que impacta',
-    sub: 'Equipos para creadores que van en serio',
-    cta: 'Ver Creadores',
-    color: 'from-orange-500/30 to-transparent',
-    accent: 'orange',
+    title: 'Tu contenido merece brillar',
+    subtitle: 'Luces, micrófonos y trípodes pensados para los que crean. El algoritmo no perdona la mala calidad.',
+    cta: 'Ver accesorios',
+    ctaLink: '#',
+    bg: 'from-slate-900 via-amber-950 to-slate-900',
+    accent: 'amber',
+    image: '/aro-luz.jpg',
+    category: 'Creadores',
   },
   {
-    image: '/powerbank-magsafe.jpg',
-    tag: 'CARGA RÁPIDA',
-    title: 'Siempre',
-    highlight: 'con energía',
-    sub: 'Cargadores y bancos de poder de alta potencia',
-    cta: 'Ver Carga',
-    color: 'from-green-500/30 to-transparent',
-    accent: 'green',
-  },
-  {
-    image: '/termo-stanley.jpg',
+    id: 4,
     tag: 'LIFESTYLE',
-    title: 'El estilo',
-    highlight: 'también importa',
-    sub: 'Accesorios que dicen mucho de quien los lleva',
-    cta: 'Ver Todo',
-    color: 'from-pink-500/30 to-transparent',
-    accent: 'pink',
+    title: 'Lleva tu estilo a otro planeta',
+    subtitle: 'Accesorios que combinan con tu vida, no solo con tu celular. Diseño + función en cada detalle.',
+    cta: 'Ver todo',
+    ctaLink: '#',
+    bg: 'from-slate-900 via-rose-950 to-slate-900',
+    accent: 'rose',
+    image: '/parlante-jbl.jpg',
+    category: 'Parlantes',
   },
 ];
 
-const accentColors: Record<string, string> = {
-  cyan: 'text-cyan-400',
-  purple: 'text-purple-400',
-  orange: 'text-orange-400',
-  green: 'text-green-400',
-  pink: 'text-pink-400',
-};
-const accentBg: Record<string, string> = {
-  cyan: 'bg-cyan-500 hover:bg-cyan-400',
-  purple: 'bg-purple-500 hover:bg-purple-400',
-  orange: 'bg-orange-500 hover:bg-orange-400',
-  green: 'bg-green-500 hover:bg-green-400',
-  pink: 'bg-pink-500 hover:bg-pink-400',
-};
-const accentBorder: Record<string, string> = {
-  cyan: 'border-cyan-500',
-  purple: 'border-purple-500',
-  orange: 'border-orange-500',
-  green: 'border-green-500',
-  pink: 'border-pink-500',
-};
+// ─── TRUST BADGES ─────────────────────────────────────────────────────────────
+const trustBadges = [
+  { icon: '🚚', label: 'Envío express', sub: 'Bogotá en 24h' },
+  { icon: '🔒', label: 'Pago seguro', sub: 'SSL + PSE' },
+  { icon: '↩️', label: 'Devoluciones', sub: '30 días sin preguntas' },
+  { icon: '⭐', label: '4.9/5 estrellas', sub: '+2.000 clientes felices' },
+];
 
-function StockBar({ stock, maxStock }: { stock: number; maxStock: number }) {
-  const pct = Math.min((stock / maxStock) * 100, 100);
-  const color =
-    pct > 50 ? 'bg-cyan-500' : pct > 20 ? 'bg-yellow-400' : 'bg-red-500';
+// ─── PRODUCT CARD ─────────────────────────────────────────────────────────────
+function ProductCard({ product, onAdd }: { product: typeof inventarioKardex[0]; onAdd: (p: typeof inventarioKardex[0]) => void }) {
+  const [hover, setHover] = useState(false);
   return (
-    <div className="w-full bg-white/10 rounded-full h-1 mt-1">
-      <div
-        className={`${color} h-1 rounded-full transition-all duration-500`}
-        style={{ width: `${pct}%` }}
-      />
+    <div
+      className="group relative bg-slate-800/60 backdrop-blur rounded-2xl overflow-hidden border border-slate-700/50 hover:border-cyan-500/60 transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/10 hover:-translate-y-1"
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+    >
+      <div className="relative bg-slate-700/30 overflow-hidden" style={{ paddingBottom: '80%' }}>
+        <Image
+          src={product.image}
+          alt={product.name}
+          fill
+          className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
+          sizes="(max-width:640px) 50vw,(max-width:1024px) 33vw,25vw"
+        />
+        {product.stock <= 5 && (
+          <span className="absolute top-2 left-2 bg-rose-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
+            Últimas {product.stock}
+          </span>
+        )}
+      </div>
+      <div className="p-4">
+        <p className="text-xs text-cyan-400 font-medium mb-1 uppercase tracking-wider">{product.brand}</p>
+        <h3 className="text-sm text-white font-semibold leading-tight mb-2 line-clamp-2">{product.name}</h3>
+        <div className="flex items-center justify-between mt-3">
+          <span className="text-lg font-bold text-white">${product.price.toLocaleString('es-CO')}</span>
+          <button
+            onClick={() => onAdd(product)}
+            className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold text-xs px-3 py-1.5 rounded-xl transition-colors"
+          >
+            + Añadir
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
 
+// ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState('Todos');
-  const [search, setSearch] = useState('');
-  const [cart, setCart] = useState<string[]>([]);
+  const [cart, setCart] = useState<typeof inventarioKardex>([]);
   const [cartOpen, setCartOpen] = useState(false);
-  const [slideIndex, setSlideIndex] = useState(0);
-  const [sliding, setSliding] = useState(false);
-  const [navbarH, setNavbarH] = useState(64);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [heroIndex, setHeroIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const heroTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const goToSlide = useCallback((idx: number) => {
-    setSliding(true);
+  // Auto-advance hero carousel
+  useEffect(() => {
+    heroTimer.current = setInterval(() => {
+      setIsAnimating(true);
+      setTimeout(() => {
+        setHeroIndex((i) => (i + 1) % heroSlides.length);
+        setIsAnimating(false);
+      }, 400);
+    }, 5000);
+    return () => { if (heroTimer.current) clearInterval(heroTimer.current); };
+  }, []);
+
+  function goToSlide(i: number) {
+    if (i === heroIndex) return;
+    setIsAnimating(true);
     setTimeout(() => {
-      setSlideIndex(idx);
-      setSliding(false);
+      setHeroIndex(i);
+      setIsAnimating(false);
     }, 300);
-  }, []);
+    if (heroTimer.current) clearInterval(heroTimer.current);
+    heroTimer.current = setInterval(() => {
+      setIsAnimating(true);
+      setTimeout(() => {
+        setHeroIndex((prev) => (prev + 1) % heroSlides.length);
+        setIsAnimating(false);
+      }, 400);
+    }, 5000);
+  }
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      goToSlide((slideIndex + 1) % heroSlides.length);
-    }, 4500);
-    return () => clearInterval(timer);
-  }, [slideIndex, goToSlide]);
-
-  useEffect(() => {
-    const nav = document.getElementById('main-nav');
-    if (nav) setNavbarH(nav.offsetHeight);
-  }, []);
+  function addToCart(product: typeof inventarioKardex[0]) {
+    setCart((prev) => [...prev, product]);
+  }
 
   const filtered = inventarioKardex.filter((p) => {
-    const matchCat =
-      activeCategory === 'Todos' || p.category === activeCategory;
-    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
+    const matchCat = activeCategory === 'Todos' || p.category === activeCategory;
+    const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchCat && matchSearch;
   });
 
-  const addToCart = (id: string) => setCart((prev) => [...prev, id]);
-  const removeFromCart = (id: string) =>
-    setCart((prev) => {
-      const i = prev.indexOf(id);
-      return i > -1 ? [...prev.slice(0, i), ...prev.slice(i + 1)] : prev;
-    });
-  const cartItems = cart
-    .map((id) => inventarioKardex.find((p) => p.id === id))
-    .filter(Boolean) as typeof inventarioKardex;
-  const cartTotal = cartItems.reduce((sum, p) => sum + p.price, 0);
-  const slide = heroSlides[slideIndex];
+  const slide = heroSlides[heroIndex];
+  const accentColors: Record<string, string> = {
+    purple: 'text-purple-400',
+    cyan: 'text-cyan-400',
+    amber: 'text-amber-400',
+    rose: 'text-rose-400',
+  };
+  const accentBorders: Record<string, string> = {
+    purple: 'border-purple-500',
+    cyan: 'border-cyan-500',
+    amber: 'border-amber-500',
+    rose: 'border-rose-500',
+  };
+  const accentBgs: Record<string, string> = {
+    purple: 'bg-purple-500 hover:bg-purple-400',
+    cyan: 'bg-cyan-500 hover:bg-cyan-400',
+    amber: 'bg-amber-500 hover:bg-amber-400',
+    rose: 'bg-rose-500 hover:bg-rose-400',
+  };
+  const accentDots: Record<string, string> = {
+    purple: 'bg-purple-500',
+    cyan: 'bg-cyan-500',
+    amber: 'bg-amber-500',
+    rose: 'bg-rose-500',
+  };
+
+  const whatsappMsg = encodeURIComponent('Hola! Vi sus productos en mundoaccesorios.vercel.app y quiero hacer un pedido');
+  const whatsappUrl = `https://wa.me/573001234567?text=${whatsappMsg}`;
 
   return (
-    <div className="min-h-screen bg-[#08080a] text-white font-sans">
-      {/* ── NAVBAR ─────────────────────────────────── */}
-      <nav
-        id="main-nav"
-        className="fixed top-0 left-0 right-0 z-50 bg-[#08080a]/95 border-b border-white/8 backdrop-blur-2xl"
-      >
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
-          {/* Logo */}
-          <a href="/" className="flex-shrink-0">
-            <img
-              src={URL_LOGO}
-              alt="Mundo Accesorios"
-              className="h-12 w-auto object-contain rounded-lg"
-            />
-          </a>
+    <div className="min-h-screen bg-slate-900 text-white">
 
-          {/* Search bar — centro */}
-          <div className="flex-1 max-w-lg mx-auto">
-            <div className="relative">
-              <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              <input
-                type="text"
-                placeholder="Buscar producto..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
-              />
+      {/* ─── NAVBAR ─────────────────────────────────────────────────────────────── */}
+      <nav className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur border-b border-slate-700/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-4 h-16">
+
+            {/* Logo */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="w-10 h-10 rounded-full border-2 border-cyan-500 overflow-hidden ring-2 ring-cyan-500/30 flex-shrink-0 bg-slate-800">
+                <Image src="/logo.png" alt="MundoAccesorios" width={40} height={40} className="object-cover w-full h-full" />
+              </div>
+              <div className="hidden sm:block">
+                <p className="text-sm font-bold text-white leading-none">Mundo</p>
+                <p className="text-xs text-cyan-400 font-semibold leading-none tracking-wider">ACCESORIOS</p>
+              </div>
             </div>
-          </div>
 
-          {/* Links desktop */}
-          <div className="hidden md:flex items-center gap-5">
-            <a
-              href="#catalogo"
-              className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors"
-            >
-              Catálogo
-            </a>
-            <a
-              href="#categorias"
-              className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors"
-            >
-              Categorías
-            </a>
-          </div>
+            {/* Search */}
+            <div className="flex-1 max-w-lg mx-auto">
+              <div className="relative">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Busca audífonos, cargadores..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-slate-800 border border-slate-600 rounded-xl pl-9 pr-4 py-2 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 transition-colors"
+                />
+              </div>
+            </div>
 
-          {/* Carrito */}
-          <button
-            onClick={() => setCartOpen(true)}
-            className="relative flex items-center gap-2 bg-cyan-500 hover:bg-cyan-400 active:scale-95 transition-all text-black px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest flex-shrink-0"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+            {/* Cart */}
+            <button
+              onClick={() => setCartOpen(!cartOpen)}
+              className="relative flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 hover:border-cyan-500 px-3 py-2 rounded-xl transition-all flex-shrink-0"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2.5}
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h11"
-              />
-            </svg>
-            <span className="hidden sm:inline">Carrito</span>
-            {cart.length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
-                {cart.length}
-              </span>
-            )}
-          </button>
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13H5.4M17 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-10 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
+              </svg>
+              <span className="text-sm font-semibold hidden sm:block">Carrito</span>
+              {cart.length > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 bg-cyan-500 text-slate-900 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                  {cart.length}
+                </span>
+              )}
+            </button>
+
+          </div>
         </div>
       </nav>
 
-      {/* ── HERO CARRUSEL ──────────────────────────── */}
-      <section
-        className="relative overflow-hidden"
-        style={{
-          paddingTop: '64px',
-          height: 'calc(100vh - 64px)',
-          minHeight: '500px',
-        }}
-      >
-        {/* Imagen de fondo */}
-        <div
-          className={`absolute inset-0 transition-opacity duration-500 ${
-            sliding ? 'opacity-0' : 'opacity-100'
-          }`}
-        >
-          <img
-            src={slide.image}
-            alt={slide.title}
-            className="absolute inset-0 w-full h-full object-cover object-center"
-          />
-          {/* Gradientes sobre la imagen */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#08080a] via-[#08080a]/80 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#08080a] via-transparent to-transparent" />
-          <div
-            className={`absolute inset-0 bg-gradient-to-br ${slide.color}`}
-          />
+      {/* ─── CATEGORY BAR (sticky below nav) ────────────────────────────────────── */}
+      <div className="sticky top-16 z-40 bg-slate-900/95 backdrop-blur border-b border-slate-700/40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide py-3">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
+                  activeCategory === cat
+                    ? 'bg-cyan-500 text-slate-900'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-600'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ─── HERO CAROUSEL ───────────────────────────────────────────────────────── */}
+      <section className={`relative overflow-hidden bg-gradient-to-br ${slide.bg} transition-all duration-700`} style={{ minHeight: '520px' }}>
+        {/* Background image */}
+        <div className={`absolute inset-0 transition-opacity duration-500 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
+          <div className="absolute right-0 top-0 w-full md:w-1/2 h-full opacity-20 md:opacity-30">
+            <Image src={slide.image} alt={slide.title} fill className="object-contain object-right-center p-8" sizes="50vw" />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/80 to-transparent" />
         </div>
 
-        {/* Contenido */}
-        <div
-          className={`relative z-10 h-full flex flex-col justify-center px-8 md:px-16 max-w-7xl mx-auto transition-all duration-500 ${
-            sliding ? 'opacity-0 translate-x-4' : 'opacity-100 translate-x-0'
-          }`}
-        >
-          <div className="max-w-xl">
-            {/* Tag */}
-            <div className="inline-flex items-center gap-2 mb-5">
-              <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-              <span className="text-[10px] font-mono font-bold tracking-[0.25em] text-cyan-400 uppercase">
-                {slide.tag}
-              </span>
-            </div>
+        {/* Decorative blobs */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 right-20 w-56 h-56 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
 
-            {/* Título */}
-            <h1 className="text-5xl md:text-7xl font-black leading-none mb-3 text-white">
-              {slide.title}
-            </h1>
-            <h1
-              className={`text-5xl md:text-7xl font-black leading-none mb-6 ${
-                accentColors[slide.accent]
-              }`}
+        {/* Content */}
+        <div className={`relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 transition-all duration-500 ${isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
+          <span className={`inline-block text-xs font-bold tracking-widest px-3 py-1 rounded-full border mb-5 ${accentColors[slide.accent]} ${accentBorders[slide.accent]} bg-white/5`}>
+            {slide.tag}
+          </span>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-5 max-w-2xl">
+            {slide.title}
+          </h1>
+          <p className="text-lg text-slate-300 mb-8 max-w-lg leading-relaxed">
+            {slide.subtitle}
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => setActiveCategory(slide.category)}
+              className={`px-6 py-3 rounded-xl font-bold text-slate-900 transition-all shadow-lg ${accentBgs[slide.accent]}`}
             >
-              {slide.highlight}
-            </h1>
-
-            {/* Sub */}
-            <p className="text-gray-300 text-base md:text-lg mb-8 font-medium leading-relaxed">
-              {slide.sub}
-            </p>
-
-            {/* CTAs */}
-            <div className="flex flex-wrap gap-3">
-              <a
-                href="#catalogo"
-                className={`${
-                  accentBg[slide.accent]
-                } text-black px-7 py-3.5 rounded-xl font-black uppercase tracking-widest text-xs transition-all active:scale-95 shadow-lg`}
-              >
-                {slide.cta}
-              </a>
-              <a
-                href="#catalogo"
-                className="border border-white/20 bg-white/5 hover:bg-white/10 text-white px-7 py-3.5 rounded-xl font-black uppercase tracking-widest text-xs transition-all active:scale-95 backdrop-blur-sm"
-              >
-                Ver Todo
-              </a>
-            </div>
+              {slide.cta}
+            </button>
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-3 rounded-xl font-bold text-white border border-white/30 hover:bg-white/10 transition-all flex items-center gap-2"
+            >
+              <span>💬</span> Pide por WhatsApp
+            </a>
           </div>
         </div>
 
-        {/* Dots navegación */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+        {/* Slide dots */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
           {heroSlides.map((_, i) => (
             <button
               key={i}
               onClick={() => goToSlide(i)}
-              className={`rounded-full transition-all duration-300 ${
-                i === slideIndex
-                  ? `w-8 h-2 ${accentBg[slide.accent]}`
-                  : 'w-2 h-2 bg-white/30 hover:bg-white/60'
+              className={`transition-all duration-300 rounded-full ${
+                i === heroIndex ? `w-8 h-2.5 ${accentDots[slide.accent]}` : 'w-2.5 h-2.5 bg-white/30 hover:bg-white/60'
               }`}
+              aria-label={`Slide ${i + 1}`}
             />
-          ))}
-        </div>
-
-        {/* Flechas */}
-        <button
-          onClick={() =>
-            goToSlide((slideIndex - 1 + heroSlides.length) % heroSlides.length)
-          }
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 border border-white/10 hover:bg-black/70 transition-all flex items-center justify-center backdrop-blur-sm"
-        >
-          <svg
-            className="w-5 h-5 text-white"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
-        <button
-          onClick={() => goToSlide((slideIndex + 1) % heroSlides.length)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 border border-white/10 hover:bg-black/70 transition-all flex items-center justify-center backdrop-blur-sm"
-        >
-          <svg
-            className="w-5 h-5 text-white"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
-
-        {/* Thumbnails en esquina inferior derecha */}
-        <div className="absolute bottom-8 right-8 z-20 hidden md:flex gap-2">
-          {heroSlides.map((s, i) => (
-            <button
-              key={i}
-              onClick={() => goToSlide(i)}
-              className={`w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${
-                i === slideIndex
-                  ? `${accentBorder[slide.accent]} scale-110`
-                  : 'border-white/20 opacity-50 hover:opacity-80'
-              }`}
-            >
-              <img
-                src={s.image}
-                alt=""
-                className="w-full h-full object-cover"
-              />
-            </button>
           ))}
         </div>
       </section>
 
-      {/* ── CATEGORÍAS sticky ──────────────────────── */}
-      <div
-        id="categorias"
-        className="sticky top-16 z-40 bg-[#08080a]/97 border-b border-white/8 backdrop-blur-2xl"
-      >
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-2 overflow-x-auto scrollbar-hide">
-          {categorias.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`whitespace-nowrap px-5 py-2 rounded-lg font-bold text-xs uppercase tracking-widest transition-all ${
-                activeCategory === cat
-                  ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/20'
-                  : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/8'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+      {/* ─── TRUST BADGES ────────────────────────────────────────────────────────── */}
+      <section className="bg-slate-800/60 border-y border-slate-700/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {trustBadges.map((b) => (
+              <div key={b.label} className="flex items-center gap-3 p-3 rounded-xl bg-slate-700/30">
+                <span className="text-2xl">{b.icon}</span>
+                <div>
+                  <p className="text-sm font-semibold text-white">{b.label}</p>
+                  <p className="text-xs text-slate-400">{b.sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* ── PRODUCTOS ──────────────────────────────── */}
-      <main className="max-w-7xl mx-auto px-4 py-8 pb-24" id="catalogo">
-        {/* Header sección */}
+      {/* ─── PRODUCTS GRID ───────────────────────────────────────────────────────── */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-black text-white uppercase tracking-wider">
+            <h2 className="text-2xl font-black text-white">
               {activeCategory === 'Todos' ? 'Todo el catálogo' : activeCategory}
             </h2>
-            <p className="text-gray-500 text-xs mt-0.5">
-              {filtered.length} productos disponibles
-            </p>
+            <p className="text-sm text-slate-400 mt-0.5">{filtered.length} productos</p>
           </div>
-          {search && (
-            <button
-              onClick={() => setSearch('')}
-              className="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-1"
-            >
-              Limpiar búsqueda ×
-            </button>
-          )}
         </div>
 
-        {filtered.length === 0 && (
-          <div className="text-center py-24 text-gray-600">
-            <p className="text-4xl mb-3">🔍</p>
-            <p className="text-lg font-bold">Sin resultados</p>
-            <p className="text-sm mt-1">
-              Intenta con otra búsqueda o categoría
-            </p>
+        {filtered.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-4xl mb-4">🔍</p>
+            <p className="text-slate-400 text-lg">No encontramos lo que buscas</p>
+            <button onClick={() => { setSearchQuery(''); setActiveCategory('Todos'); }} className="mt-4 text-cyan-400 hover:text-cyan-300 underline text-sm">
+              Ver todos los productos
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {filtered.map((product) => (
+              <ProductCard key={product.id} product={product} onAdd={addToCart} />
+            ))}
           </div>
         )}
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {filtered.map((producto) => {
-            const isLowStock = producto.stock <= 3;
-            return (
-              <div
-                key={producto.id}
-                className="group bg-[#111115] border border-white/5 rounded-2xl overflow-hidden hover:border-cyan-500/40 hover:shadow-xl hover:shadow-cyan-500/5 transition-all duration-300"
-              >
-                {/* Imagen */}
-                <div className="relative aspect-square overflow-hidden bg-[#1a1a20]">
-                  <img
-                    src={producto.image}
-                    alt={producto.name}
-                    className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700"
-                  />
-                  {/* Overlay hover */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
-
-                  {/* Badge */}
-                  <div className="absolute top-2 left-2 flex flex-col gap-1">
-                    <span className="bg-cyan-500 text-black text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest shadow-lg">
-                      {producto.badge}
-                    </span>
-                    {isLowStock && (
-                      <span className="bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest animate-pulse">
-                        ¡{producto.stock} left!
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Info */}
-                <div className="p-3.5">
-                  <p className="text-[9px] text-cyan-500 uppercase tracking-widest font-bold mb-0.5">
-                    {producto.category}
-                  </p>
-                  <h3 className="text-xs font-black text-white leading-snug line-clamp-2 mb-2">
-                    {producto.name}
-                  </h3>
-
-                  <p className="text-white font-black text-base leading-none">
-                    <span className="text-gray-400 text-[10px] font-medium">
-                      COP{' '}
-                    </span>
-                    {producto.price.toLocaleString('es-CO')}
-                  </p>
-
-                  {/* Stock */}
-                  <div className="mt-2.5">
-                    <div className="flex justify-between text-[9px] text-gray-500 mb-1">
-                      <span>Stock: {producto.stock}</span>
-                      <span>
-                        {Math.round((producto.stock / producto.maxStock) * 100)}
-                        %
-                      </span>
-                    </div>
-                    <StockBar
-                      stock={producto.stock}
-                      maxStock={producto.maxStock}
-                    />
-                  </div>
-
-                  <button
-                    onClick={() => addToCart(producto.id)}
-                    className="w-full mt-3 bg-white/8 hover:bg-cyan-500 hover:text-black text-white text-[10px] font-black py-2.5 rounded-lg uppercase tracking-widest transition-all duration-200 border border-white/10 hover:border-cyan-500 active:scale-95"
-                  >
-                    + Agregar
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
       </main>
 
-      {/* ── CARRITO SLIDE-IN ───────────────────────── */}
+      {/* ─── FEATURED BANNER ─────────────────────────────────────────────────────── */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <div className="rounded-2xl overflow-hidden bg-gradient-to-r from-cyan-600 to-purple-700 relative p-8 md:p-12">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl" />
+          </div>
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <p className="text-cyan-200 text-sm font-bold tracking-widest uppercase mb-2">Oferta de la semana</p>
+              <h3 className="text-3xl md:text-4xl font-black text-white leading-tight">
+                Audífonos Sony<br />hasta 40% OFF
+              </h3>
+              <p className="text-white/80 mt-2 max-w-sm">Sonido de estudio. Cancelación activa de ruido. Para los que se toman en serio la música.</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => setActiveCategory('Audífonos')}
+                className="px-8 py-3 bg-white text-slate-900 font-black rounded-xl hover:bg-slate-100 transition-colors shadow-lg text-sm"
+              >
+                Ver oferta
+              </button>
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-8 py-3 border-2 border-white/50 text-white font-bold rounded-xl hover:bg-white/10 transition-colors text-sm text-center flex items-center justify-center gap-2"
+              >
+                💬 Consultar
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── FOOTER ──────────────────────────────────────────────────────────────── */}
+      <footer className="bg-slate-800/80 border-t border-slate-700/50 mt-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 rounded-full border-2 border-cyan-500 overflow-hidden bg-slate-700">
+                  <Image src="/logo.png" alt="MundoAccesorios" width={36} height={36} className="object-cover w-full h-full" />
+                </div>
+                <div>
+                  <p className="font-bold text-white text-sm leading-none">Mundo</p>
+                  <p className="text-cyan-400 text-xs font-semibold tracking-wider leading-none">ACCESORIOS</p>
+                </div>
+              </div>
+              <p className="text-sm text-slate-400 leading-relaxed">Tu tienda de confianza para accesorios tecnológicos en Colombia. Calidad garantizada, precio justo.</p>
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-white mb-3 uppercase tracking-wider">Categorías</h4>
+              <ul className="space-y-1.5">
+                {categories.filter(c => c !== 'Todos').map(c => (
+                  <li key={c}>
+                    <button onClick={() => setActiveCategory(c)} className="text-sm text-slate-400 hover:text-cyan-400 transition-colors">{c}</button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-white mb-3 uppercase tracking-wider">Contáctanos</h4>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li className="flex items-center gap-2">
+                  <span>💬</span>
+                  <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition-colors break-all">
+                    WhatsApp: wa.me/573001234567
+                  </a>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span>📍</span> Bogotá, Colombia
+                </li>
+                <li className="flex items-center gap-2">
+                  <span>🕐</span> Lun–Sáb 8am–7pm
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-slate-700/50 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-xs text-slate-500">© 2025 MundoAccesorios. Todos los derechos reservados.</p>
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-xl font-semibold text-sm transition-colors shadow-md"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.278 7.034L.786 23.214l4.328-1.389A11.943 11.943 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.836 9.836 0 0 1-5.012-1.371l-.36-.214-3.721 1.194 1.215-3.63-.234-.374A9.818 9.818 0 0 1 2.182 12C2.182 6.575 6.575 2.182 12 2.182S21.818 6.575 21.818 12 17.425 21.818 12 21.818z"/>
+              </svg>
+              Pedir por WhatsApp
+            </a>
+          </div>
+        </div>
+      </footer>
+
+      {/* ─── CART DRAWER ─────────────────────────────────────────────────────────── */}
       {cartOpen && (
         <div className="fixed inset-0 z-50 flex justify-end">
-          <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-md"
-            onClick={() => setCartOpen(false)}
-          />
-          <div className="relative w-full max-w-sm bg-[#0f0f13] border-l border-white/8 h-full flex flex-col shadow-2xl">
-            {/* Header carrito */}
-            <div className="p-5 border-b border-white/8 flex items-center justify-between">
-              <div>
-                <h3 className="font-black uppercase tracking-widest text-sm">
-                  Tu pedido
-                </h3>
-                <p className="text-gray-500 text-xs mt-0.5">
-                  {cart.length} {cart.length === 1 ? 'artículo' : 'artículos'}
-                </p>
-              </div>
-              <button
-                onClick={() => setCartOpen(false)}
-                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 transition-colors flex items-center justify-center text-gray-400 hover:text-white"
-              >
-                ×
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setCartOpen(false)} />
+          <div className="relative w-full max-w-sm bg-slate-800 border-l border-slate-700 flex flex-col h-full shadow-2xl">
+            <div className="flex items-center justify-between p-5 border-b border-slate-700">
+              <h2 className="text-lg font-bold text-white">Carrito ({cart.length})</h2>
+              <button onClick={() => setCartOpen(false)} className="text-slate-400 hover:text-white p-1">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
-
-            {/* Items */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {cartItems.length === 0 && (
-                <div className="text-center mt-16">
+            <div className="flex-1 overflow-y-auto p-5">
+              {cart.length === 0 ? (
+                <div className="text-center py-16">
                   <p className="text-4xl mb-3">🛒</p>
-                  <p className="text-gray-500 text-sm font-medium">
-                    Tu carrito está vacío
-                  </p>
-                  <p className="text-gray-600 text-xs mt-1">
-                    Agrega productos para continuar
-                  </p>
+                  <p className="text-slate-400">Tu carrito está vacío</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {cart.map((item, i) => (
+                    <div key={i} className="flex items-center gap-3 bg-slate-700/50 rounded-xl p-3">
+                      <div className="relative w-12 h-12 bg-slate-600 rounded-lg overflow-hidden flex-shrink-0">
+                        <Image src={item.image} alt={item.name} fill className="object-contain p-1" sizes="48px" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-white truncate">{item.name}</p>
+                        <p className="text-cyan-400 font-bold text-sm">${item.price.toLocaleString('es-CO')}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
-              {cartItems.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="flex gap-3 items-center bg-white/4 rounded-xl p-3 border border-white/5"
-                >
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-14 h-14 object-cover rounded-lg flex-shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold truncate text-white">
-                      {item.name}
-                    </p>
-                    <p className="text-cyan-400 text-sm font-black mt-0.5">
-                      COP {item.price.toLocaleString('es-CO')}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => removeFromCart(item.id)}
-                    className="w-7 h-7 rounded-lg bg-red-500/10 hover:bg-red-500/30 transition-colors flex items-center justify-center text-red-400 hover:text-red-300 text-sm flex-shrink-0"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
             </div>
-
-            {/* Footer carrito */}
-            {cartItems.length > 0 && (
-              <div className="p-5 border-t border-white/8 space-y-4">
+            {cart.length > 0 && (
+              <div className="p-5 border-t border-slate-700 space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400 text-sm">Total</span>
+                  <span className="text-slate-400">Total</span>
                   <span className="text-white font-black text-xl">
-                    COP {cartTotal.toLocaleString('es-CO')}
+                    ${cart.reduce((s, p) => s + p.price, 0).toLocaleString('es-CO')}
                   </span>
                 </div>
-                <button className="w-full bg-cyan-500 hover:bg-cyan-400 active:scale-95 transition-all text-black py-3.5 rounded-xl font-black uppercase tracking-widest text-xs shadow-lg shadow-cyan-500/20">
-                  Finalizar Pedido por WhatsApp
-                </button>
-                <button
-                  onClick={() => setCartOpen(false)}
-                  className="w-full text-center text-gray-500 hover:text-white text-xs transition-colors"
+                <a
+                  href={`https://wa.me/573001234567?text=${encodeURIComponent('Hola! Quiero pedir:\n' + cart.map((p,i) => `${i+1}. ${p.name} - $${p.price.toLocaleString('es-CO')}`).join('\n') + `\nTotal: $${cart.reduce((s,p)=>s+p.price,0).toLocaleString('es-CO')}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full bg-green-600 hover:bg-green-500 text-white text-center font-bold py-3 rounded-xl transition-colors"
                 >
-                  Seguir comprando
+                  💬 Pedir por WhatsApp
+                </a>
+                <button onClick={() => setCart([])} className="block w-full text-center text-sm text-slate-400 hover:text-rose-400 transition-colors py-1">
+                  Vaciar carrito
                 </button>
               </div>
             )}
           </div>
         </div>
       )}
+
     </div>
   );
 }
